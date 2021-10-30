@@ -1,0 +1,7 @@
+/* This ensures no white space around the rendered canvas/screen */
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
