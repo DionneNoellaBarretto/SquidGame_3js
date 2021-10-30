@@ -16,7 +16,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 // appending dom element to canvas body
 document.body.appendChild(renderer.domElement);
 
-// this changes the background color from black to this (0xb7c3f3) lilac blue tone & 1 denotes the opacity of the color
+// this changes the background color from black to this (0xb7c3f3) lilac blue tone & 1 denotes the full opacity of the color
 renderer.setClearColor(0xb7c3f3,1);
 
 // ( see loader.load section below) of all the lights possible setting ambient light : https://threejs.org/docs/?q=light#api/en/lights/AmbientLight starter code
@@ -41,15 +41,20 @@ camera.position.z = -3;
 
 //  for the image - downloaded a free 3d image from (doesnt work)https://sketchfab.com/3d-models/alien-c8da20ee647b4bda8b164d442b13ab4a#download likewise the squid game doll image (works -https://sketchfab.com/3d-models/squid-game-doll-ccfed977f35446a7914a3abc5e393182) ( the gltf file is a zipfolder thats been extracted as models in this repository)
 // giant doll - works: https://sketchfab.com/3d-models/squid-game-giant-doll-6f9049e47c4e4e7cb3e6dcf9535d46fa#download
-// doesnt work https://sketchfab.com/3d-models/squidward-spongebob-7b493d23a7d941639b92cb162c175611#download - squidward 3d image
+// doesn't work https://sketchfab.com/3d-models/squidward-spongebob-7b493d23a7d941639b92cb162c175611#download - squidward 3d image
 // https://threejs.org/docs/?q=glt#examples/en/loaders/GLTFLoader copying over the some portion of the starter code for gltf loading/rendering
 // Instantiate a new gltf loader
 // adding THREE. since we did not import this using npm i but rather manually!
 const loader = new THREE.GLTFLoader();
 
+// doll class to call methods within it
+class Doll { // this wont show up without the let doll declaration
+    constructor () {
+
 // calling the function to load our alien/doll glTF resource with a callback function
 // since we are in the js folder hence appending ../ before models to move up a directory
-loader.load("./models/scene.gltf", function (gltf) {
+// not using function (gltf) since we are using this.doll here hence converted it to a arrow function! 
+loader.load("./models/scene.gltf",  (gltf) => {
   scene.add(gltf.scene);
   // this wont render as is if no light is present! (see light section above after the document.body element)
 
@@ -58,9 +63,40 @@ loader.load("./models/scene.gltf", function (gltf) {
 gltf.scene.scale.set(1.6,1.6,1.6);
 
 // to move the doll image to the center of the page as opposed to right up top by playing with the z axis ( +1 moves it higher, -1 moves it lower!):
-gltf.scene.position.set(0,0,-15);
+gltf.scene.position.set(0,-1,-15);
+this.doll = gltf.scene;
+
 // animate();
 });
+    }
+    // turning the doll to show her back towards us using y axis rotation
+    backOfDoll() {
+        // this.doll.rotation.y =-3.2;
+        // every .45 second rotating the doll through to her position
+        gsap.to(this.doll.rotation, {y :-3.2,duration:.45})
+        }
+
+        // turning back the doll to the front position using y axis rotation
+frontOfDoll() {
+        // this.doll.rotation.y =0;
+         // every .45 second rotating the doll through to her position facing forward
+        gsap.to(this.doll.rotation, {y :0,duration:.45})
+        }
+}
+
+// creating a track for the movement of the person 
+
+
+
+
+// https://greensock.com/gsap/ animation for gradually manuvering the doll from front facing to back facing and back to front facing!
+
+let doll = new Doll ();
+// without the set timeout since the model takes a while to load you may see an uncaught typeerror stating cannot read props fo undefined (reasing rotation ) and (setting doll)
+setTimeout(() => {
+doll.backOfDoll();
+},1000) // calling after 1 sec
+
 
 // dynamically calling the renderer as opposed to manually calling it for each shape as described above^
 function animate() {
