@@ -1,0 +1,11 @@
+Model Information:
+* title:	Squid Game - Giant Doll
+* source:	https://sketchfab.com/3d-models/squid-game-giant-doll-6f9049e47c4e4e7cb3e6dcf9535d46fa
+* author:	2Konseil (https://sketchfab.com/2Konseil)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Squid Game - Giant Doll" (https://sketchfab.com/3d-models/squid-game-giant-doll-6f9049e47c4e4e7cb3e6dcf9535d46fa) by 2Konseil (https://sketchfab.com/2Konseil) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
