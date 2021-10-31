@@ -25,7 +25,7 @@ const light = new THREE.AmbientLight(0xffffff); // soft white light
 scene.add(light);
 
 //global variable declaration
-const startPosition = 3;
+const startPosition = 5;
 const endPosition = -startPosition;
 
 //  the movement of the cube thats being resized per its geometry : https://threejs.org/docs/?q=box#api/en/geometries/BoxGeometry
