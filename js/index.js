@@ -45,6 +45,7 @@ const startPosition = -5; //this is minus since its on the left of the x-axis
 const endPosition = -startPosition; //this is -ve of -5 i.t +5 on the x-axis meaning the right
 // const playerPosition = startPosition -0.4;
 const text = document.querySelector(".text");
+const balls = document.querySelector(".balls");
 const TIME_LIMIT = 10;
 let gameStat = "Loading";
 let isLookingAtPlayer = true;
@@ -203,7 +204,7 @@ class Player {
     }
     if (this.playerInfo.positionX > (endPosition - 0.163)){
         // alert("Whoppppy! - you won! You sneaked passed stealthily !");
-        text.innerText ="Whoppppy! - you won! You sneaked passed stealthily !";
+        text.innerText ="Whoppppy! - you won! You sneaked passed through stealthily !";
     gameStat = "Game Over!! Feel Free to Play Again! ";
     }
     
@@ -223,7 +224,9 @@ const player = new Player();
 //   doll.start();
 // }, 1000); // calling after 1 sec
 async function init() {
+  
   await delay(400);
+  balls.innerText = "";
   text.innerText = "Starting in 3";
   await delay(400);
   text.innerText = "Starting in 2";
