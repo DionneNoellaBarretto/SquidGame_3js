@@ -89,16 +89,16 @@ class Doll {
   backOfDoll() {
     // this.doll.rotation.y =-3.2;
     // every .45 second rotating the doll through to her position
-    gsap.to(this.doll.rotation, {y: -3.2, duration: 0.35});
-    setTimeout(() => dollFacingBack = true, 150);
+    gsap.to(this.doll.rotation, { y: -3.2, duration: 0.35 });
+    setTimeout(() => (dollFacingBack = true), 150);
   }
 
   // turning back the doll to the front position using y axis rotation
   frontOfDoll() {
     // this.doll.rotation.y =0;
     // every .45 second rotating the doll through to her position facing forward
-    gsap.to(this.doll.rotation, {y: 0, duration: 0.35});
-  setTimeout(() => dollFacingBack = false, 450);
+    gsap.to(this.doll.rotation, { y: 0, duration: 0.35 });
+    setTimeout(() => (dollFacingBack = false), 450);
   }
 }
 
@@ -149,18 +149,20 @@ class Player {
       positionX: startPosition,
       velocity: 0,
       name,
-            isDead: false
+      isDead: false,
     };
   }
   run() {
-      if(this.playerInfo.isDead) return
+    if (this.playerInfo.isDead) return;
     // loader.load("./po_model/scene.gltf", (gltf) => {
     this.playerInfo.velocity = 0.03;
     // });
   }
-      stop(){
-        gsap.to(this.playerInfo, { duration: .1, velocity: 0 })
-    }
+  stop() {
+    //   this.playerInfo.velocity =0;
+    //   gradual stop as opposed to sudden stop
+    gsap.to(this.playerInfo, { duration: 0.1, velocity: 0 });
+  }
   // po only moves when velocity is 1
   update() {
     // loader.load("./po_model/scene.gltf", (gltf) => {
@@ -171,38 +173,37 @@ class Player {
     this.playerInfo.positionX += this.playerInfo.velocity;
     this.player.position.x = this.playerInfo.positionX;
   }
-    check(){
-        if(this.playerInfo.isDead) return
-        if(!dollFacingBack && this.playerInfo.velocity > 0){
-            text.innerText = this.playerInfo.name + " lost!!!"
-            this.playerInfo.isDead = true
-            this.stop()
-            DEAD_PLAYERS++
-            loseMusic.play()
-            if(DEAD_PLAYERS == players.length){
-                text.innerText = "Everyone lost!!!"
-                gameStat = "ended"
-            }
-            if(DEAD_PLAYERS + SAFE_PLAYERS == players.length){
-                gameStat = "ended"
-            }
-        }
-        if(this.playerInfo.positionX < end_position + .7){
-            text.innerText = this.playerInfo.name + " is safe!!!"
-            this.playerInfo.isDead = true
-            this.stop()
-            SAFE_PLAYERS++
-            winMusic.play()
-            if(SAFE_PLAYERS == players.length){
-                text.innerText = "Everyone is safe!!!"
-                gameStat = "ended"
-            }
-            if(DEAD_PLAYERS + SAFE_PLAYERS == players.length){
-                gameStat = "ended"
-            }
-        }
+  check() {
+    if (this.playerInfo.isDead) return;
+    if (!dollFacingBack && this.playerInfo.velocity > 0) {
+      text.innerText = this.playerInfo.name + " lost!!!";
+      this.playerInfo.isDead = true;
+      this.stop();
+      DEAD_PLAYERS++;
+      loseMusic.play();
+      if (DEAD_PLAYERS == players.length) {
+        text.innerText = "Everyone lost!!!";
+        gameStat = "ended";
+      }
+      if (DEAD_PLAYERS + SAFE_PLAYERS == players.length) {
+        gameStat = "ended";
+      }
     }
-
+    if (this.playerInfo.positionX < end_position + 0.7) {
+      text.innerText = this.playerInfo.name + " is safe!!!";
+      this.playerInfo.isDead = true;
+      this.stop();
+      SAFE_PLAYERS++;
+      winMusic.play();
+      if (SAFE_PLAYERS == players.length) {
+        text.innerText = "Everyone is safe!!!";
+        gameStat = "ended";
+      }
+      if (DEAD_PLAYERS + SAFE_PLAYERS == players.length) {
+        gameStat = "ended";
+      }
+    }
+  }
 }
 
 const player = new Player();
@@ -241,5 +242,28 @@ function onWindowResize() {
 
 //window event key handling listener for right key being pressed to advance the player
 window.addEventListener("keydown", (e) => {
-  alert(e.key);
+  // alert(e.key);
+  if (e.key === "ArrowUp") {
+    player.run();
+  } else if (e.key === "ArrowRight") {
+    player.run();
+  } else if (e.key === "w") {
+    player.run();
+  } else if (e.key === "d") {
+    player.run();
+  }
+});
+
+// stopping call
+window.addEventListener("keyup", (e) => {
+  // alert(e.key);
+  if (e.key === "ArrowDown") {
+    player.stop();
+  } else if (e.key === "ArrowLeft") {
+    player.stop();
+  } else if (e.key === "s") {
+    player.stop();
+  } else if (e.key === "a") {
+    player.stop();
+  }
 });
