@@ -97,7 +97,6 @@ class Doll {
     gsap.to(this.doll.rotation, { y: -3.2, duration: 0.35 });
     setTimeout(() => (isLookingAtPlayer = true), 150);
   }
-  
 
   // turning back the doll to the front position using y axis rotation
   async frontOfDoll() {
@@ -168,7 +167,7 @@ class Player {
     scene.add(sphere);
     this.player = sphere;
     this.playerInfo = {
-      positionX: (startPosition + 0.163),
+      positionX: startPosition + 0.163,
       velocity: 0, //sphere is not moving
       name,
       isDead: false,
@@ -198,16 +197,17 @@ class Player {
   }
   check() {
     //   conditional truthy check with and for moving player
-    if ((this.playerInfo.velocity > 0) && (!isLookingAtPlayer)) {
+    if (this.playerInfo.velocity > 0 && !isLookingAtPlayer) {
       //   alert("Oh No - you lost! You were caught moving !");
-      text.innerText = "Oh No - you lost! You were caught moving !";
-      gameStat = "Game Over!! Please Try Again by refreshing your browser! ";
+      text.innerText =
+        "Oh No - you lost! You were caught moving.. Please Try Again by refreshing your browser!!";
+      gameStat = "Game Over!!";
     }
-    if (this.playerInfo.positionX > (endPosition - 0.163)) {
+    if (this.playerInfo.positionX > endPosition - 0.163) {
       // alert("Whoppppy! - you won! You sneaked passed stealthily !");
       text.innerText =
-        "Whoppppy! - you won! You sneaked passed through stealthily !";
-      gameStat = "Game Over!! Feel Free to Play Again by refreshing your browser! ";
+        "Whoppppy! - you won! You sneaked passed through stealthily. Feel Free to Play Again by refreshing your browser!";
+      gameStat = "Game Over!!! ";
     }
     // if (
     //   (gameStat === "Game Over!") &&
@@ -221,7 +221,7 @@ class Player {
 }
 
 const player = new Player();
-  // game logic
+// game logic
 // // without the set timeout since the model takes a while to load you may see an uncaught type error stating cannot read props fo undefined (reading rotation ) and (setting doll)
 // setTimeout(() => {
 //   //   doll.backOfDoll();
@@ -250,14 +250,13 @@ function startGame() {
   // this shrinks down out progress bar!
   gsap.to(progressBar.scale, { duration: TIME_LIMIT, x: 0, ease: "none" });
   setTimeout(() => {
-      doll.start();
+    doll.start();
     if (gameStat != "Game Over!") {
       text.innerText = "Time Ran Out!!!";
       // loseMusic.play()
       gameStat = "Game Over!";
     }
   }, TIME_LIMIT * 1000); //multiplying ms time limit by 1 second
-  
 }
 
 init();
@@ -293,15 +292,25 @@ function onWindowResize() {
 window.addEventListener("keydown", (e) => {
   // alert(e.key);
   if (gameStat != "Game has started") return; //   ensures user can move before the game timer has started
-  if (e.key === "ArrowUp" || e.key === "ArrowRight" || e.key === "w" || e.key === "d") {
+  if (
+    e.key === "ArrowUp" ||
+    e.key === "ArrowRight" ||
+    e.key === "w" ||
+    e.key === "d"
+  ) {
     player.run();
-  } 
+  }
 });
 
 // stopping call
 window.addEventListener("keyup", (e) => {
   // alert(e.key);
-  if (e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "s" || e.key === "a") {
+  if (
+    e.key === "ArrowDown" ||
+    e.key === "ArrowLeft" ||
+    e.key === "s" ||
+    e.key === "a"
+  ) {
     player.stop();
-  } 
+  }
 });
