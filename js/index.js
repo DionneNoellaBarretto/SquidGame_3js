@@ -1,7 +1,7 @@
 // https://threejs.org/docs/#manual/en/introduction/Creating-a-scene starter code
 // black canvas starter code - scenes is what we see
 const scene = new THREE.Scene();
-// to view the screen using the most basic perspective camera  that takes 4 args (leaving this as default )
+// to view the screen using the most basic perspective camera  that takes 4 args fov,aspect,near and far - (leaving this as default )
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -90,8 +90,6 @@ class Doll {
   }
 
 
- // https://greensock.com/gsap/ animation for gradually maneuvering the doll from front facing to back facing and back to front facing!
-
   // turning the doll to show her back towards us using y axis rotation
 backOfDoll(){
     // this.doll.rotation.y =-3.2;
@@ -108,6 +106,9 @@ frontOfDoll() {
     setTimeout(() => isLookingAtPlayer = false, 350);
   }
   
+
+ // https://greensock.com/gsap/ animation for gradually maneuvering the doll from front facing to back facing and back to front facing!
+
   // recursive function of the doll ( starts the dolls rotation)
   async start() {
     //   calls the back state of the doll
@@ -197,7 +198,7 @@ class Player {
   }
   check() {
     //   conditional truthy check with and for moving player
-    if ((this.playerInfo.velocity > 0) && (!isLookingAtPlayer)) {
+    if ((this.playerInfo.velocity > 0) && (!isLookingAtPlayer))  {
     //   alert("Oh No - you lost! You were caught moving !");
     text.innerText ="Oh No - you lost! You were caught moving !";
     gameStat = "Game Over!! Please Try Again! ";
@@ -206,6 +207,11 @@ class Player {
         // alert("Whoppppy! - you won! You sneaked passed stealthily !");
         text.innerText ="Whoppppy! - you won! You sneaked passed through stealthily !";
     gameStat = "Game Over!! Feel Free to Play Again! ";
+    }
+    if ((gameStat === "Game Over!") && (this.playerInfo.positionX < (endPosition - 0.163))){
+      //   alert("Oh No - you lost! You were caught moving !");
+    text.innerText ="Oh No - you lost! You didn't reach the other end!";
+    gameStat = "Game Over!! Please Try Again! ";
     }
     
   }
