@@ -45,7 +45,33 @@ const endPosition = -startPosition; //this is -ve of -5 i.t +5 on the x-axis mea
 // const playerPosition = startPosition -0.4;
 const text = document.querySelector(".text");
 const balls = document.querySelector(".balls");
-const TIME_LIMIT = 20;
+
+//user input for time interval
+
+let userInput = prompt(
+  "Enter a time (0-59 seconds) limit you think you need to complete this challenge ( Best Score: 20 seconds )!"
+);
+
+if (userInput == null) {
+  // user hit cancel
+  alert("You clicked cancel!");
+  // return true;
+} else {
+  if (userInput.length <= 0 || isNaN(userInput)) {
+    // user pressed OK, but input invalid or does not input anything
+    alert(
+      "Invalid input entered. Please refresh the browser page and enter a time between (0-59 seconds)."
+    );
+  } else {
+    // user typed something valid and hit OK
+    alert(
+      `Good luck completing this challenge in ${userInput} seconds of time! \n If that is not what you intended to provide, please feel free to refresh the browser page and enter a new time between (0-59 seconds) to complete this challenge! `
+    );
+    // return userInput;
+  }
+}
+
+const TIME_LIMIT = parseInt(userInput);
 let gameStat = "Loading";
 let isLookingAtPlayer = true;
 
@@ -200,13 +226,13 @@ class Player {
     if (this.playerInfo.velocity > 0 && !isLookingAtPlayer) {
       //   alert("Oh No - you lost! You were caught moving !");
       text.innerText =
-        "Oh No - you lost! You were caught moving.. Please Try Again by refreshing your browser!!";
+        "Oh No - you lost! You were caught moving.. Please try again by refreshing your browser!!";
       gameStat = "Game Over!!";
     }
     if (this.playerInfo.positionX > endPosition - 0.163) {
       // alert("Whoppppy! - you won! You sneaked passed stealthily !");
       text.innerText =
-        "Whoppppy! - you won! You sneaked passed through stealthily. Feel Free to Play Again by refreshing your browser!";
+        "Whoppppy! - you won! You sneaked passed through stealthily. Feel free to `Play Again` by refreshing your browser!";
       gameStat = "Game Over!!! ";
     }
     // if (
@@ -252,7 +278,8 @@ function startGame() {
   setTimeout(() => {
     doll.start();
     if (gameStat != "Game Over!") {
-      text.innerText = "Time Ran Out!!!";
+      text.innerText =
+        "Oops ! Time Ran Out! Please try again by refreshing your browser!";
       // loseMusic.play()
       gameStat = "Game Over!";
     }
