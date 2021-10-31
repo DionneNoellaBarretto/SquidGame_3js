@@ -23,7 +23,6 @@ renderer.setClearColor(0xb7c3f3, 1);
 const light = new THREE.AmbientLight(0xffffff); // soft white light
 scene.add(light);
 
-
 // this determines how far from the scene to display / render the camera (the green block will appear bigger if this value is less than 5 and appear smaller if its greater than 5 )
 
 camera.position.z = 5;
@@ -46,10 +45,9 @@ const endPosition = -startPosition; //this is -ve of -5 i.t +5 on the x-axis mea
 // const playerPosition = startPosition -0.4;
 const text = document.querySelector(".text");
 const balls = document.querySelector(".balls");
-const TIME_LIMIT = 10;
+const TIME_LIMIT = 20;
 let gameStat = "Loading";
 let isLookingAtPlayer = true;
-
 
 //  the movement of the cube thats being resized per its geometry : https://threejs.org/docs/?q=box#api/en/geometries/BoxGeometry
 function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
@@ -57,7 +55,7 @@ function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
   // size.w,h,d are the arguments being passed when the create cube function is called below!
   const geometry = new THREE.BoxGeometry(size.w, size.h, size.d);
   // mesh basic material colors the cube
-  const material = new THREE.MeshBasicMaterial({ color: color });
+  const material = new THREE.MeshBasicMaterial({ color: color }); //0xfbc851
   const cube = new THREE.Mesh(geometry, material);
 
   cube.position.x = positionX;
@@ -68,6 +66,9 @@ function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
   return cube;
 }
 
+async function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 // doll class to call methods within it
 class Doll {
@@ -77,8 +78,8 @@ class Doll {
     // since we are in the js folder hence appending ../ before models to move up a directory
     // not using function (gltf) since we are using this.doll here hence converted it to a arrow function!
     loader.load("./models/scene.gltf", (gltf) => {
-      scene.add(gltf.scene);      // this wont render as is if no light is present! (see light section above after the document.body element)
-      doll = gltf.scene;
+      scene.add(gltf.scene); // this wont render as is if no light is present! (see light section above after the document.body element)
+      // this.doll = gltf.scene;
       // sizing adjustment with 3 dimensions x/y/z axis
       // this is a static size which can cause problems with responsiveness..
       gltf.scene.scale.set(0.4, 0.4, 0.4);
@@ -88,26 +89,25 @@ class Doll {
       this.doll = gltf.scene;
     });
   }
-
-
   // turning the doll to show her back towards us using y axis rotation
-backOfDoll(){
+
+  async backOfDoll() {
     // this.doll.rotation.y =-3.2;
     // every .45 second rotating the doll through to her position
     gsap.to(this.doll.rotation, { y: -3.2, duration: 0.35 });
-    setTimeout(() => isLookingAtPlayer = true, 100);
-  }
-
-  // turning back the doll to the front position using y axis rotation
-frontOfDoll() {
-    // this.doll.rotation.y =0;
-    // every .45 second rotating the doll through to her position facing forward
-    gsap.to(this.doll.rotation, { y: 0, duration: 0.35 });
-    setTimeout(() => isLookingAtPlayer = false, 350);
+    setTimeout(() => (isLookingAtPlayer = true), 150);
   }
   
 
- // https://greensock.com/gsap/ animation for gradually maneuvering the doll from front facing to back facing and back to front facing!
+  // turning back the doll to the front position using y axis rotation
+  async frontOfDoll() {
+    // this.doll.rotation.y =0;
+    // every .45 second rotating the doll through to her position facing forward
+    gsap.to(this.doll.rotation, { y: 0, duration: 0.35 });
+    setTimeout(() => (isLookingAtPlayer = false), 450);
+  }
+
+  // https://greensock.com/gsap/ animation for gradually maneuvering the doll from front facing to back facing and back to front facing!
 
   // recursive function of the doll ( starts the dolls rotation)
   async start() {
@@ -115,15 +115,15 @@ frontOfDoll() {
     this.backOfDoll();
     // await delay(1000);  1 sec intervals
     // making it challenging with a random interval between (0-1000 +1000)
-    await delay(Math.random() * 1000 + 1000);
+    await delay(Math.random() * 900 + 900);
     this.frontOfDoll();
     // await delay(1000);
     await delay(Math.random() * 750 + 750);
-
     this.start();
   }
 }
 
+let doll = new Doll();
 // creating a track for the movement of the person
 function createTrack() {
   // center cube is the largest hence placing it as the first cube
@@ -134,7 +134,7 @@ function createTrack() {
     0,
     //color of the middle track panel
     0xe5a716
-  ).position.z = -0.9;
+  ).position.z = -0.9; //position z pushes the second long cube panel to the back to give it a depth appearance
 
   // right side placement
   createCube({ w: 0.2, h: 1.3, d: 1 }, startPosition, -0.35);
@@ -168,8 +168,8 @@ class Player {
     scene.add(sphere);
     this.player = sphere;
     this.playerInfo = {
-      positionX: startPosition + 0.163,
-      velocity: 0,
+      positionX: (startPosition + 0.163),
+      velocity: 0, //sphere is not moving
       name,
       isDead: false,
     };
@@ -177,13 +177,13 @@ class Player {
   run() {
     if (this.playerInfo.isDead) return;
     // loader.load("./po_model/scene.gltf", (gltf) => {
-    this.playerInfo.velocity = 0.03;
+    this.playerInfo.velocity = 0.01;
     // });
   }
   stop() {
     //   this.playerInfo.velocity =0;
     //   gradual stop as opposed to sudden stop
-    gsap.to(this.playerInfo, { duration: 0.1, velocity: 0 });
+    gsap.to(this.playerInfo, { duration: 0.01, velocity: 0 });
   }
   // po only moves when velocity is 1
   update() {
@@ -198,69 +198,66 @@ class Player {
   }
   check() {
     //   conditional truthy check with and for moving player
-    if ((this.playerInfo.velocity > 0) && (!isLookingAtPlayer))  {
-    //   alert("Oh No - you lost! You were caught moving !");
-    text.innerText ="Oh No - you lost! You were caught moving !";
-    gameStat = "Game Over!! Please Try Again! ";
-    }
-    if (this.playerInfo.positionX > (endPosition - 0.163)){
-        // alert("Whoppppy! - you won! You sneaked passed stealthily !");
-        text.innerText ="Whoppppy! - you won! You sneaked passed through stealthily !";
-    gameStat = "Game Over!! Feel Free to Play Again! ";
-    }
-    if ((gameStat === "Game Over!") && (this.playerInfo.positionX < (endPosition - 0.163))){
+    if ((this.playerInfo.velocity > 0) && (!isLookingAtPlayer)) {
       //   alert("Oh No - you lost! You were caught moving !");
-    text.innerText ="Oh No - you lost! You didn't reach the other end!";
-    gameStat = "Game Over!! Please Try Again! ";
+      text.innerText = "Oh No - you lost! You were caught moving !";
+      gameStat = "Game Over!! Please Try Again by refreshing your browser! ";
     }
-    
+    if (this.playerInfo.positionX > (endPosition - 0.163)) {
+      // alert("Whoppppy! - you won! You sneaked passed stealthily !");
+      text.innerText =
+        "Whoppppy! - you won! You sneaked passed through stealthily !";
+      gameStat = "Game Over!! Feel Free to Play Again by refreshing your browser! ";
+    }
+    // if (
+    //   (gameStat === "Game Over!") &&
+    //   (this.playerInfo.positionX < (endPosition - 0.163))
+    // ) {
+    //   //   alert("Oh No - you lost! You were caught moving !");
+    //   text.innerText = "Oh No - you lost! You didn't reach the other end!";
+    //   gameStat = "Game Over!! Please Try Again! ";
+    // }
   }
 }
 
-async function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 const player = new Player();
- let doll = new Doll(); 
-
-// game logic
+  // game logic
 // // without the set timeout since the model takes a while to load you may see an uncaught type error stating cannot read props fo undefined (reading rotation ) and (setting doll)
 // setTimeout(() => {
 //   //   doll.backOfDoll();
 //   doll.start();
 // }, 1000); // calling after 1 sec
 async function init() {
-  
-  await delay(400);
+  await delay(5000);
   balls.innerText = "";
+  gameStat = "Game Loading";
   text.innerText = "Starting in 3";
-  await delay(400);
+  await delay(1000);
   text.innerText = "Starting in 2";
-  await delay(400);
+  await delay(1000);
   text.innerText = "Starting in 1";
-  await delay(400);
-  text.innerText = "Go!!! ";
+  await delay(1000);
+  text.innerText = "Begin!!! ";
   startGame();
 }
 
-
 function startGame() {
+  doll.start();
   gameStat = "Game has started";
   // live timer up top!
   const progressBar = createCube({ w: 10, h: 0.1, d: 1 }, 0, 0, 0xe5a716);
   progressBar.position.y = 3.35;
   // this shrinks down out progress bar!
   gsap.to(progressBar.scale, { duration: TIME_LIMIT, x: 0, ease: "none" });
-   doll.start;
   setTimeout(() => {
+      doll.start();
     if (gameStat != "Game Over!") {
       text.innerText = "Time Ran Out!!!";
       // loseMusic.play()
       gameStat = "Game Over!";
     }
   }, TIME_LIMIT * 1000); //multiplying ms time limit by 1 second
-
- 
+  
 }
 
 init();
@@ -296,27 +293,15 @@ function onWindowResize() {
 window.addEventListener("keydown", (e) => {
   // alert(e.key);
   if (gameStat != "Game has started") return; //   ensures user can move before the game timer has started
-  if (e.key === "ArrowUp") {
+  if (e.key === "ArrowUp" || e.key === "ArrowRight" || e.key === "w" || e.key === "d") {
     player.run();
-  } else if (e.key === "ArrowRight") {
-    player.run();
-  } else if (e.key === "w") {
-    player.run();
-  } else if (e.key === "d") {
-    player.run();
-  }
+  } 
 });
 
 // stopping call
 window.addEventListener("keyup", (e) => {
   // alert(e.key);
-  if (e.key === "ArrowDown") {
+  if (e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "s" || e.key === "a") {
     player.stop();
-  } else if (e.key === "ArrowLeft") {
-    player.stop();
-  } else if (e.key === "s") {
-    player.stop();
-  } else if (e.key === "a") {
-    player.stop();
-  }
+  } 
 });

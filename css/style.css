@@ -74,7 +74,7 @@
     bottom: 0;
     left: -0.25em;
     right: -0.25em;
-    background-color: #fc2f70;
+    background-color: #fd800a;
     transform-origin: bottom center;
     transform: scaleY(0.1);
     transition: all 0.1s ease-in-out;
@@ -82,5 +82,5 @@
   
 p:hover::before {
     transform: scaleY(1);
-    background-color: hsla(147, 97%, 59%, 0.75);
+    background-color: hsla(147, 91%, 65%, 0.75);
   }
