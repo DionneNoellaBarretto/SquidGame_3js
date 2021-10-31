@@ -25,8 +25,9 @@ const light = new THREE.AmbientLight(0xffffff); // soft white light
 scene.add(light);
 
 //global variable declaration
-const startPosition = 5;
-const endPosition = -startPosition;
+const startPosition = -5; //this is minus sincce its on the left of the x-axis
+const endPosition = -startPosition; //this is -ve of -5 i.t +5 on the x-axis meaning the right
+// const playerPosition = startPosition -0.4;
 
 //  the movement of the cube thats being resized per its geometry : https://threejs.org/docs/?q=box#api/en/geometries/BoxGeometry
 function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
@@ -41,7 +42,7 @@ function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
   cube.rotation.y = rotationY;
 
   scene.add(cube);
-
+// shows the cube at the positions defined..
   return cube;
 
 }
@@ -101,33 +102,86 @@ class Doll {
 }
 
 // creating a track for the movement of the person
-
 function createTrack() {
   // center cube is the largest hence placing it as the first cube
   createCube(
-    { w: startPosition * 2, h: 1.5, d: 1 },
+    { w: startPosition * 2, h: 1.3, d: 1 },
     0,
     0,
     0xe5a716
-  ).position.z = -1;
+  ).position.z = -0.9;
 
   // right side placement
-  createCube({ w: 0.2, h: 1.5, d: 1 }, startPosition, -0.35);
+  createCube({ w: 0.2, h: 1.3, d: 1 }, startPosition, -0.35);
   // left side placement
-  createCube({ w: 0.2, h: 1.5, d: 1 }, endPosition, 0.35);
+  createCube({ w: 0.2, h: 1.3, d: 1 }, endPosition, 0.35);
 }
 createTrack();
+
+
+// creating a player using po as a character https://sketchfab.com/juleg 
+
+class Player {
+    constructor(){
+// loader.load("./po_model/scene.gltf", (gltf) => {
+//       scene.add(gltf.scene);
+//       gltf.scene.scale.set(0.9, 0.9, 0.5);
+//       gltf.scene.position.x = playerPosition;  //set(11, -5.3, -7);
+//       this.player = gltf.scene;
+//       this.playerInfo ={
+//           positionX: playerPosition,
+//         //   speed when 0 po wont move
+//           velocity: 0
+//       }
+//     });
+
+//sphere geometry (player representation) https://threejs.org/docs/?q=sphere#api/en/geometries/SphereGeometry
+const geometry = new THREE.SphereGeometry( 0.15, 26, 14 );
+// color of the sphere : https://www.htmlcsscolor.com/hex/006868
+const material = new THREE.MeshBasicMaterial( { color: 0x006868 } );
+const sphere = new THREE.Mesh( geometry, material );
+sphere.position.z=1;
+sphere.position.x = startPosition +0.15;
+scene.add( sphere );
+this.player =sphere;
+this.playerInfo={
+    positionX:startPosition,
+    velocity:0
+}
+    
+}
+run (){
+    // loader.load("./po_model/scene.gltf", (gltf) => {
+    // this.playerInfo.velocity = .1;
+    // });
+
+    this.playerInfo.velocity = .1;
+}
+// po only moves when velocity is 1
+update(){    
+// loader.load("./po_model/scene.gltf", (gltf) => {
+//     // decrease the position x of player Po from right to left hence -ve=
+//     this.playerInfo.positionX -= this.playerInfo.velocity;
+//     gltf.scene.position.x = this.playerInfo.positionX;
+// });
+this.playerInfo.positionX +=this.playerInfo.velocity;
+this.playerInfo.position.x = this.playerInfo.positionX;
+
+}}
+
+
+const player = new Player();
 
 
 let doll = new Doll();
 // without the set timeout since the model takes a while to load you may see an uncaught typeerror stating cannot read props fo undefined (reading rotation ) and (setting doll)
 setTimeout(() => {
-  doll.backOfDoll();
+doll.backOfDoll();
 }, 1000); // calling after 1 sec
 
 // dynamically calling the renderer as opposed to manually calling it for each shape as described above^
 function animate() {
-  renderer.render(scene, camera);
+renderer.render(scene, camera);
   // animating the cube by rotating along x/y/z axis and defining a rotation speed! ( 1 is pretty fast hence i slowed it down to 0.01)
   // along x axis
   // cube.rotation.x +=0.01;
@@ -138,6 +192,8 @@ function animate() {
 
   //  this is whats being called again and again!
   requestAnimationFrame(animate);
+//   to call the movement of po
+  player.update();
 }
 animate();
 
@@ -149,3 +205,7 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
+
+
+//window event key handling listener for right key being pressed to advance the player
+
