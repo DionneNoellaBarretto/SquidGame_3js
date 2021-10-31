@@ -1,5 +1,4 @@
 // https://threejs.org/docs/#manual/en/introduction/Creating-a-scene starter code
-
 // black canvas starter code - scenes is what we see
 const scene = new THREE.Scene();
 // to view the screen using the most basic perspective camera  that takes 4 args (leaving this as default )
@@ -24,15 +23,37 @@ renderer.setClearColor(0xb7c3f3, 1);
 const light = new THREE.AmbientLight(0xffffff); // soft white light
 scene.add(light);
 
+
+// this determines how far from the scene to display / render the camera (the green block will appear bigger if this value is less than 5 and appear smaller if its greater than 5 )
+
+camera.position.z = 5;
+// every time you create a shape for your scene renderer needs to be called but manually calling it isn't practical which is why the subsequent block of code is used instead...
+// this calls the renderer to display the green colored cube on our scene/canvas
+// renderer.render(scene, camera);
+// renderer.setClearColor( 0xB7C3F3, 1 );
+
+//  for the image - downloaded a free 3d image from (doesn't work)https://sketchfab.com/3d-models/alien-c8da20ee647b4bda8b164d442b13ab4a#download likewise the squid game doll image (works -https://sketchfab.com/3d-models/squid-game-doll-ccfed977f35446a7914a3abc5e393182) ( the gltf file is a zipfolder thats been extracted as models in this repository)
+// giant doll - works: https://sketchfab.com/3d-models/squid-game-giant-doll-6f9049e47c4e4e7cb3e6dcf9535d46fa#download
+// doesn't work https://sketchfab.com/3d-models/squidward-spongebob-7b493d23a7d941639b92cb162c175611#download - squidward 3d image
+// https://threejs.org/docs/?q=glt#examples/en/loaders/GLTFLoader copying over the some portion of the starter code for gltf loading/rendering
+// Instantiate a new gltf loader
+// adding THREE. since we did not import this using npm i but rather manually!
+const loader = new THREE.GLTFLoader();
+
 //global variable declaration
-const startPosition = -5; //this is minus sincce its on the left of the x-axis
+const startPosition = -5; //this is minus since its on the left of the x-axis
 const endPosition = -startPosition; //this is -ve of -5 i.t +5 on the x-axis meaning the right
 // const playerPosition = startPosition -0.4;
+const text = document.querySelector(".text");
+const TIME_LIMIT = 10;
+let gameStat = "Loading";
+let isLookingAtPlayer = true;
+
 
 //  the movement of the cube thats being resized per its geometry : https://threejs.org/docs/?q=box#api/en/geometries/BoxGeometry
 function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
   // creating a box geometry to create cubes ( the most basic shape) - starter code snippit https://threejs.org/docs/#manual/en/introduction/Creating-a-scene copied over.. in 3 world all shapes are box geometry
-  // size.w,h,d are the arguments being passed when the createcube function is called below!
+  // size.w,h,d are the arguments being passed when the create cube function is called below!
   const geometry = new THREE.BoxGeometry(size.w, size.h, size.d);
   // mesh basic material colors the cube
   const material = new THREE.MeshBasicMaterial({ color: color });
@@ -46,21 +67,6 @@ function createCube(size, positionX, rotationY = 0, color = 0xfbc851) {
   return cube;
 }
 
-// every time you create a shape for your scene renderer needs to be called but manually calling it isn't practical which is why the subsequent block of code is used instead...
-// this calls the renderer to display the green colored cube on our scene/canvas
-// renderer.render(scene, camera);
-
-// this determines how far from the scene to display / render the camera (the green block will appear bigger if this value is less than 5 and appear smaller if its greater than 5 )
-
-camera.position.z = 5;
-
-//  for the image - downloaded a free 3d image from (doesnt work)https://sketchfab.com/3d-models/alien-c8da20ee647b4bda8b164d442b13ab4a#download likewise the squid game doll image (works -https://sketchfab.com/3d-models/squid-game-doll-ccfed977f35446a7914a3abc5e393182) ( the gltf file is a zipfolder thats been extracted as models in this repository)
-// giant doll - works: https://sketchfab.com/3d-models/squid-game-giant-doll-6f9049e47c4e4e7cb3e6dcf9535d46fa#download
-// doesn't work https://sketchfab.com/3d-models/squidward-spongebob-7b493d23a7d941639b92cb162c175611#download - squidward 3d image
-// https://threejs.org/docs/?q=glt#examples/en/loaders/GLTFLoader copying over the some portion of the starter code for gltf loading/rendering
-// Instantiate a new gltf loader
-// adding THREE. since we did not import this using npm i but rather manually!
-const loader = new THREE.GLTFLoader();
 
 // doll class to call methods within it
 class Doll {
@@ -70,9 +76,8 @@ class Doll {
     // since we are in the js folder hence appending ../ before models to move up a directory
     // not using function (gltf) since we are using this.doll here hence converted it to a arrow function!
     loader.load("./models/scene.gltf", (gltf) => {
-      scene.add(gltf.scene);
-      // this wont render as is if no light is present! (see light section above after the document.body element)
-
+      scene.add(gltf.scene);      // this wont render as is if no light is present! (see light section above after the document.body element)
+      doll = gltf.scene;
       // sizing adjustment with 3 dimensions x/y/z axis
       // this is a static size which can cause problems with responsiveness..
       gltf.scene.scale.set(0.4, 0.4, 0.4);
@@ -83,22 +88,37 @@ class Doll {
     });
   }
 
-  // https://greensock.com/gsap/ animation for gradually manuvering the doll from front facing to back facing and back to front facing!
+
+ // https://greensock.com/gsap/ animation for gradually maneuvering the doll from front facing to back facing and back to front facing!
 
   // turning the doll to show her back towards us using y axis rotation
-  backOfDoll() {
+backOfDoll(){
     // this.doll.rotation.y =-3.2;
     // every .45 second rotating the doll through to her position
     gsap.to(this.doll.rotation, { y: -3.2, duration: 0.35 });
-    setTimeout(() => (dollFacingBack = true), 150);
+    setTimeout(() => isLookingAtPlayer = true, 100);
   }
 
   // turning back the doll to the front position using y axis rotation
-  frontOfDoll() {
+frontOfDoll() {
     // this.doll.rotation.y =0;
     // every .45 second rotating the doll through to her position facing forward
     gsap.to(this.doll.rotation, { y: 0, duration: 0.35 });
-    setTimeout(() => (dollFacingBack = false), 450);
+    setTimeout(() => isLookingAtPlayer = false, 350);
+  }
+  
+  // recursive function of the doll ( starts the dolls rotation)
+  async start() {
+    //   calls the back state of the doll
+    this.backOfDoll();
+    // await delay(1000);  1 sec intervals
+    // making it challenging with a random interval between (0-1000 +1000)
+    await delay(Math.random() * 1000 + 1000);
+    this.frontOfDoll();
+    // await delay(1000);
+    await delay(Math.random() * 750 + 750);
+
+    this.start();
   }
 }
 
@@ -146,7 +166,7 @@ class Player {
     scene.add(sphere);
     this.player = sphere;
     this.playerInfo = {
-      positionX: startPosition,
+      positionX: startPosition + 0.163,
       velocity: 0,
       name,
       isDead: false,
@@ -170,48 +190,71 @@ class Player {
     //     this.playerInfo.positionX -= this.playerInfo.velocity;
     //     gltf.scene.position.x = this.playerInfo.positionX;
     // });
+    this.check();
     this.playerInfo.positionX += this.playerInfo.velocity;
     this.player.position.x = this.playerInfo.positionX;
   }
   check() {
-    if (this.playerInfo.isDead) return;
-    if (!dollFacingBack && this.playerInfo.velocity > 0) {
-      text.innerText = this.playerInfo.name + " lost!!!";
-      this.playerInfo.isDead = true;
-      this.stop();
-      DEAD_PLAYERS++;
-      loseMusic.play();
-      if (DEAD_PLAYERS == players.length) {
-        text.innerText = "Everyone lost!!!";
-        gameStat = "ended";
-      }
-      if (DEAD_PLAYERS + SAFE_PLAYERS == players.length) {
-        gameStat = "ended";
-      }
+    //   conditional truthy check with and for moving player
+    if ((this.playerInfo.velocity > 0) && (!isLookingAtPlayer)) {
+    //   alert("Oh No - you lost! You were caught moving !");
+    text.innerText ="Oh No - you lost! You were caught moving !";
+    gameStat = "Game Over!! Please Try Again! ";
     }
-    if (this.playerInfo.positionX < end_position + 0.7) {
-      text.innerText = this.playerInfo.name + " is safe!!!";
-      this.playerInfo.isDead = true;
-      this.stop();
-      SAFE_PLAYERS++;
-      winMusic.play();
-      if (SAFE_PLAYERS == players.length) {
-        text.innerText = "Everyone is safe!!!";
-        gameStat = "ended";
-      }
-      if (DEAD_PLAYERS + SAFE_PLAYERS == players.length) {
-        gameStat = "ended";
-      }
+    if (this.playerInfo.positionX > (endPosition - 0.163)){
+        // alert("Whoppppy! - you won! You sneaked passed stealthily !");
+        text.innerText ="Whoppppy! - you won! You sneaked passed stealthily !";
+    gameStat = "Game Over!! Feel Free to Play Again! ";
     }
+    
   }
 }
 
+async function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 const player = new Player();
-let doll = new Doll();
-// without the set timeout since the model takes a while to load you may see an uncaught typeerror stating cannot read props fo undefined (reading rotation ) and (setting doll)
-setTimeout(() => {
-  doll.backOfDoll();
-}, 1000); // calling after 1 sec
+ let doll = new Doll(); 
+
+// game logic
+// // without the set timeout since the model takes a while to load you may see an uncaught type error stating cannot read props fo undefined (reading rotation ) and (setting doll)
+// setTimeout(() => {
+//   //   doll.backOfDoll();
+//   doll.start();
+// }, 1000); // calling after 1 sec
+async function init() {
+  await delay(400);
+  text.innerText = "Starting in 3";
+  await delay(400);
+  text.innerText = "Starting in 2";
+  await delay(400);
+  text.innerText = "Starting in 1";
+  await delay(400);
+  text.innerText = "Go!!! ";
+  startGame();
+}
+
+
+function startGame() {
+  gameStat = "Game has started";
+  // live timer up top!
+  const progressBar = createCube({ w: 10, h: 0.1, d: 1 }, 0, 0, 0xe5a716);
+  progressBar.position.y = 3.35;
+  // this shrinks down out progress bar!
+  gsap.to(progressBar.scale, { duration: TIME_LIMIT, x: 0, ease: "none" });
+   doll.start;
+  setTimeout(() => {
+    if (gameStat != "Game Over!") {
+      text.innerText = "Time Ran Out!!!";
+      // loseMusic.play()
+      gameStat = "Game Over!";
+    }
+  }, TIME_LIMIT * 1000); //multiplying ms time limit by 1 second
+
+ 
+}
+
+init();
 
 // dynamically calling the renderer as opposed to manually calling it for each shape as described above^
 function animate() {
@@ -243,6 +286,7 @@ function onWindowResize() {
 //window event key handling listener for right key being pressed to advance the player
 window.addEventListener("keydown", (e) => {
   // alert(e.key);
+  if (gameStat != "Game has started") return; //   ensures user can move before the game timer has started
   if (e.key === "ArrowUp") {
     player.run();
   } else if (e.key === "ArrowRight") {

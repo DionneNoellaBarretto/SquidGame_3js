@@ -5,3 +5,12 @@
     padding: 0;
 }
 
+.text{
+    position: fixed;
+    top: 20px;
+    font-weight: bold;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 50px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
